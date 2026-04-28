@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Masso Timer</title>
+
+    <link rel="shortcut icon" href="timer_512.png" type="image/x-icon">
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style.css">
+
+    <meta name="theme-color" content="#000000">
+    <link rel="apple-touch-icon" href="timer_192.png">
+</head>
+
+<body>
+
+    <main class="container" role="main">
+
+        <h1 tabindex="0">Masso Timer</h1>
+
+        <!-- Instrução acessível -->
+        <p class="sr-only">
+            Use a tecla Tab para navegar entre os botões.
+            Pressione Enter ou Espaço para iniciar ou parar o timer.
+        </p>
+
+        <!-- Display -->
+        <h2 id="display" aria-live="polite">00:00</h2>
+
+        <!-- Botões -->
+        <button id="massagem1"
+            aria-label="Iniciar ou parar massagem relaxante de 2 minutos">
+            MASSAGEM 1 - 2 MIN
+        </button>
+
+        <button id="massagem2"
+            aria-label="Iniciar ou parar massagem terapêutica de 3 minutos">
+            MASSAGEM 2 - 3 MIN
+        </button>
+
+    </main>
+
+    <script src="app.js"></script>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/massotimer/sw.js')
+                .then((registration) => {
+                    console.log('Service Worker registrado:', registration.scope);
+                })
+                .catch((error) => {
+                    console.log('Erro no Service Worker:', error);
+                });
+        }
+    </script>
+
+</body>
+
+</html>
