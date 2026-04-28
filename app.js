@@ -36,8 +36,7 @@ function bip(freq = 500, dur = 0.3) {
 
 // 🔔 Aviso a cada minuto
 function avisoMinuto() {
-    bip(500, 0.4);
-    setTimeout(() => bip(500, 0.4), 600);
+    bip(528, 0.9); // tom suave e único
 }
 
 // ⏰ Final tranquilo
@@ -55,12 +54,19 @@ function falar(texto) {
 
     const msg = new SpeechSynthesisUtterance(texto);
     msg.lang = "pt-BR";
-    msg.rate = 1;
+    msg.rate = 1.05;
     msg.pitch = 1;
     msg.volume = 1;
 
+    const voices = speechSynthesis.getVoices();
+    if (voices.length > 0) {
+        msg.voice = voices.find(v => v.lang.includes("pt")) || voices[0];
+    }
+
     speechSynthesis.speak(msg);
 }
+
+
 
 // ⏱ Formatar
 function formatarTempo(seg) {
@@ -168,9 +174,10 @@ btn2.addEventListener("click", () => iniciarTimer(3, btn2));
 configurarBotao(btn1);
 configurarBotao(btn2);
 
-// Instrução inicial
 window.addEventListener("load", () => {
+    speechSynthesis.getVoices();
+
     setTimeout(() => {
-        falar("Masso Timer carregado. Use Tab para navegar entre os botões de massagem.");
-    }, 1000);
+        falar("Masso Timer carregado. Deslize para navegar entre as opções de massagem e toque duas vezes para ativar.");
+    }, 300);
 });
