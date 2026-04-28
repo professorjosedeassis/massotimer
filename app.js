@@ -5,6 +5,19 @@ const btn2 = document.getElementById("massagem2");
 let intervalo = null;
 let tempoRestante = 0;
 let botaoAtivo = null;
+let wakeLock = null;
+
+ativarWakeLock();
+
+async function ativarWakeLock() {
+    try {
+        if ('wakeLock' in navigator) {
+            wakeLock = await navigator.wakeLock.request('screen');
+        }
+    } catch (err) {
+        console.log("Wake Lock não suportado");
+    }
+}
 
 // Região para leitor de tela
 const liveRegion = document.createElement("div");
@@ -36,7 +49,8 @@ function bip(freq = 500, dur = 0.3) {
 
 // 🔔 Aviso a cada minuto
 function avisoMinuto() {
-    bip(528, 0.9); // tom suave e único
+    bip(720, 0.35);
+    setTimeout(() => bip(720, 0.35), 500);
 }
 
 // ⏰ Final tranquilo
