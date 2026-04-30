@@ -5,21 +5,8 @@ const btn2 = document.getElementById("massagem2");
 let intervalo = null;
 let tempoRestante = 0;
 let botaoAtivo = null;
-let wakeLock = null;
 
-ativarWakeLock();
-
-async function ativarWakeLock() {
-    try {
-        if ('wakeLock' in navigator) {
-            wakeLock = await navigator.wakeLock.request('screen');
-        }
-    } catch (err) {
-        console.log("Wake Lock não suportado");
-    }
-}
-
-// Região para leitor de tela
+// Região para leitores
 const liveRegion = document.createElement("div");
 liveRegion.setAttribute("aria-live", "assertive");
 liveRegion.classList.add("sr-only");
@@ -28,8 +15,8 @@ document.body.appendChild(liveRegion);
 // Áudio
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-// 🔊 Bip suave
-function bip(freq = 500, dur = 0.3) {
+// 🔊 Bip principal
+function bip(freq = 880, dur = 0.45) {
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
 
@@ -37,7 +24,7 @@ function bip(freq = 500, dur = 0.3) {
     osc.frequency.value = freq;
 
     gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.15, audioCtx.currentTime + 0.05);
+    gain.gain.exponentialRampToValueAtTime(0.35, audioCtx.currentTime + 0.03);
     gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
 
     osc.connect(gain);
@@ -47,13 +34,15 @@ function bip(freq = 500, dur = 0.3) {
     osc.stop(audioCtx.currentTime + dur);
 }
 
-// 🔔 Aviso a cada minuto
+// 🔔 Aviso de progresso a cada minuto
 function avisoMinuto() {
-    bip(720, 0.35);
-    setTimeout(() => bip(720, 0.35), 500);
+    bip(880, 0.45);
+    setTimeout(() => {
+        bip(880, 0.45);
+    }, 500);
 }
 
-// ⏰ Final tranquilo
+// ⏰ Finalização tranquila
 function avisoFinal() {
     bip(432, 0.8);
     setTimeout(() => bip(528, 0.8), 900);
@@ -80,7 +69,12 @@ function falar(texto) {
     speechSynthesis.speak(msg);
 }
 
-
+// 📳 Vibração
+function vibrar(padrao = [200]) {
+    if ("vibrate" in navigator) {
+        navigator.vibrate(padrao);
+    }
+}
 
 // ⏱ Formatar
 function formatarTempo(seg) {
@@ -95,14 +89,7 @@ function atualizarDisplay() {
     display.textContent = formatarTempo(tempoRestante);
 }
 
-// Vibração opcional
-function vibrar(padrao = [200]) {
-    if ("vibrate" in navigator) {
-        navigator.vibrate(padrao);
-    }
-}
-
-// Parar
+// ⛔ Parar
 function pararTimer() {
     clearInterval(intervalo);
     intervalo = null;
@@ -111,7 +98,7 @@ function pararTimer() {
     falar("Timer parado");
 }
 
-// Iniciar
+// ▶️ Iniciar
 function iniciarTimer(minutos, botao) {
 
     if (audioCtx.state === "suspended") {
@@ -124,7 +111,7 @@ function iniciarTimer(minutos, botao) {
         return;
     }
 
-    // Outro timer ativo
+    // Outro timer
     if (intervalo) {
         pararTimer();
     }
@@ -138,16 +125,17 @@ function iniciarTimer(minutos, botao) {
     vibrar([150, 100, 150]);
 
     intervalo = setInterval(() => {
+
         tempoRestante--;
         atualizarDisplay();
 
-        // Aviso a cada minuto
+        // 🔔 Aviso a cada minuto
         if (tempoRestante > 0 && tempoRestante % 60 === 0) {
             avisoMinuto();
-            vibrar([200, 100, 200]);
+            vibrar([250, 100, 250]);
         }
 
-        // Final
+        // ⏰ Final
         if (tempoRestante <= 0) {
             clearInterval(intervalo);
             intervalo = null;
@@ -164,10 +152,8 @@ function iniciarTimer(minutos, botao) {
     }, 1000);
 }
 
-// Foco acessível com confirmação leve
+// Configuração universal mobile
 function configurarBotao(botao) {
-
-    botao.setAttribute("tabindex", "0");
 
     botao.addEventListener("focus", () => {
         bip(700, 0.15);
@@ -188,10 +174,11 @@ btn2.addEventListener("click", () => iniciarTimer(3, btn2));
 configurarBotao(btn1);
 configurarBotao(btn2);
 
+// Inicialização
 window.addEventListener("load", () => {
     speechSynthesis.getVoices();
 
     setTimeout(() => {
-        falar("Masso Timer carregado. Deslize para navegar entre as opções de massagem e toque duas vezes para ativar.");
+        falar("Masso Timer carregado. Deslize para navegar entre as opções e toque duas vezes para ativar.");
     }, 300);
 });

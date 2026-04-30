@@ -20,23 +20,21 @@
 
         <h1 tabindex="0">Masso Timer</h1>
 
-        <!-- Instrução acessível -->
-        <p class="sr-only">
-            Masso Timer carregado. Deslize para navegar entre as opções de massagem e toque duas vezes para ativar.
+        <!-- Instruções para leitores -->
+        <p id="instrucoes" class="sr-only">
+            Deslize para navegar entre as opções e toque duas vezes para iniciar ou parar.
         </p>
 
-        <!-- Display -->
-        <h2 id="display" aria-live="polite">00:00</h2>
+        <!-- Display apenas visual -->
+        <h2 id="display" aria-hidden="true">00:00</h2>
 
-        <!-- Botões -->
-        <button id="massagem1"
-            aria-label="Massagem relaxante de 2 minutos. Toque duas vezes para iniciar ou parar.">
-            MASSAGEM 1 - 2 MIN
+        <!-- Botões acessíveis universalmente -->
+        <button id="massagem1" aria-describedby="instrucoes">
+            Massagem 1 - 2 minutos
         </button>
 
-        <button id="massagem2"
-            aria-label="Massagem relaxante de 3 minutos. Toque duas vezes para iniciar ou parar.">
-            MASSAGEM 2 - 3 MIN
+        <button id="massagem2" aria-describedby="instrucoes">
+            Massagem 2 - 3 minutos
         </button>
 
     </main>
