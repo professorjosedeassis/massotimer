@@ -44,6 +44,7 @@ function atualizarDisplay() {
 
     // Atualiza leitor de forma controlada
     if (tempoRestante % 60 === 0 && tempoRestante > 0) {
+        bip(440, 0.25); // aviso suave por minuto
         falar(`${tempoRestante / 60} minuto restante`);
     }
 }
@@ -110,6 +111,10 @@ function iniciarTimer(minutos, botao) {
 
             vibrar([300, 150, 300, 150, 500]);
 
+            bip(440, 0.2);
+            setTimeout(() => bip(520, 0.2), 250);
+            setTimeout(() => bip(660, 0.35), 500);
+
             falar("Massagem finalizada");
         }
 
@@ -125,6 +130,6 @@ window.addEventListener("load", () => {
     document.querySelector("main").focus();
 
     setTimeout(() => {
-        falar("Masso Timer carregado");
+        btn1.focus();
     }, 500);
 });
