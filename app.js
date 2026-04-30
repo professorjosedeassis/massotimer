@@ -1,4 +1,6 @@
 const display = document.getElementById("display");
+const status = document.getElementById("timer-status");
+
 const btn1 = document.getElementById("massagem1");
 const btn2 = document.getElementById("massagem2");
 
@@ -6,25 +8,16 @@ let intervalo = null;
 let tempoRestante = 0;
 let botaoAtivo = null;
 
-// Região para leitores
-const liveRegion = document.createElement("div");
-liveRegion.setAttribute("aria-live", "assertive");
-liveRegion.classList.add("sr-only");
-document.body.appendChild(liveRegion);
-
-// Áudio
+// 🔊 Som (mantido — não interfere com leitor)
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-// 🔊 Bip principal
-function bip(freq = 880, dur = 0.45) {
+function bip(freq = 500, dur = 0.3) {
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
 
-    osc.type = "sine";
     osc.frequency.value = freq;
-
     gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.35, audioCtx.currentTime + 0.03);
+    gain.gain.exponentialRampToValueAtTime(0.15, audioCtx.currentTime + 0.05);
     gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
 
     osc.connect(gain);
@@ -34,84 +27,62 @@ function bip(freq = 880, dur = 0.45) {
     osc.stop(audioCtx.currentTime + dur);
 }
 
-// 🔔 Aviso de progresso a cada minuto
-function avisoMinuto() {
-    bip(880, 0.45);
-    setTimeout(() => {
-        bip(880, 0.45);
-    }, 500);
-}
-
-// ⏰ Finalização tranquila
-function avisoFinal() {
-    bip(432, 0.8);
-    setTimeout(() => bip(528, 0.8), 900);
-    setTimeout(() => bip(639, 1.2), 1800);
-}
-
-// 🗣 Voz
+// 🗣️ Apenas via aria-live (sem speechSynthesis)
 function falar(texto) {
-    liveRegion.textContent = texto;
-
-    speechSynthesis.cancel();
-
-    const msg = new SpeechSynthesisUtterance(texto);
-    msg.lang = "pt-BR";
-    msg.rate = 1.05;
-    msg.pitch = 1;
-    msg.volume = 1;
-
-    const voices = speechSynthesis.getVoices();
-    if (voices.length > 0) {
-        msg.voice = voices.find(v => v.lang.includes("pt")) || voices[0];
-    }
-
-    speechSynthesis.speak(msg);
+    status.textContent = texto;
 }
 
-// 📳 Vibração
+// ⏱
+function formatarTempo(seg) {
+    const min = Math.floor(seg / 60);
+    const sec = seg % 60;
+    return `${String(min).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
+}
+
+function atualizarDisplay() {
+    display.textContent = formatarTempo(tempoRestante);
+
+    // Atualiza leitor de forma controlada
+    if (tempoRestante % 60 === 0 && tempoRestante > 0) {
+        falar(`${tempoRestante / 60} minuto restante`);
+    }
+}
+
+// Vibração
 function vibrar(padrao = [200]) {
     if ("vibrate" in navigator) {
         navigator.vibrate(padrao);
     }
 }
 
-// ⏱ Formatar
-function formatarTempo(seg) {
-    const min = Math.floor(seg / 60);
-    const sec = seg % 60;
-
-    return `${String(min).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
-}
-
-// Atualizar
-function atualizarDisplay() {
-    display.textContent = formatarTempo(tempoRestante);
-}
-
-// ⛔ Parar
+// Parar
 function pararTimer() {
     clearInterval(intervalo);
     intervalo = null;
+
+    if (botaoAtivo) {
+        botaoAtivo.setAttribute("aria-pressed", "false");
+    }
+
     botaoAtivo = null;
 
     falar("Timer parado");
 }
 
-// ▶️ Iniciar
+// Iniciar
 function iniciarTimer(minutos, botao) {
 
     if (audioCtx.state === "suspended") {
         audioCtx.resume();
     }
 
-    // Mesmo botão
+    // Mesmo botão = toggle
     if (botaoAtivo === botao) {
         pararTimer();
         return;
     }
 
-    // Outro timer
+    // Outro ativo
     if (intervalo) {
         pararTimer();
     }
@@ -119,66 +90,41 @@ function iniciarTimer(minutos, botao) {
     tempoRestante = minutos * 60;
     botaoAtivo = botao;
 
+    botao.setAttribute("aria-pressed", "true");
+
     atualizarDisplay();
 
     falar(`Iniciando massagem de ${minutos} minutos`);
     vibrar([150, 100, 150]);
 
     intervalo = setInterval(() => {
-
         tempoRestante--;
         atualizarDisplay();
 
-        // 🔔 Aviso a cada minuto
-        if (tempoRestante > 0 && tempoRestante % 60 === 0) {
-            avisoMinuto();
-            vibrar([250, 100, 250]);
-        }
-
-        // ⏰ Final
         if (tempoRestante <= 0) {
             clearInterval(intervalo);
             intervalo = null;
+
+            botao.setAttribute("aria-pressed", "false");
             botaoAtivo = null;
 
-            avisoFinal();
             vibrar([300, 150, 300, 150, 500]);
 
-            setTimeout(() => {
-                falar("Massagem finalizada");
-            }, 3200);
+            falar("Massagem finalizada");
         }
 
     }, 1000);
-}
-
-// Configuração universal mobile
-function configurarBotao(botao) {
-
-    botao.addEventListener("focus", () => {
-        bip(700, 0.15);
-    });
-
-    botao.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            botao.click();
-        }
-    });
 }
 
 // Eventos
 btn1.addEventListener("click", () => iniciarTimer(2, btn1));
 btn2.addEventListener("click", () => iniciarTimer(3, btn2));
 
-configurarBotao(btn1);
-configurarBotao(btn2);
-
-// Inicialização
+// Foco inicial (importante)
 window.addEventListener("load", () => {
-    speechSynthesis.getVoices();
+    document.querySelector("main").focus();
 
     setTimeout(() => {
-        falar("Masso Timer carregado. Deslize para navegar entre as opções e toque duas vezes para ativar.");
-    }, 300);
+        falar("Masso Timer carregado");
+    }, 500);
 });

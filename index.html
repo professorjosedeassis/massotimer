@@ -16,28 +16,40 @@
 
 <body>
 
-    <main class="container" role="main">
+  <main class="container" role="main" tabindex="-1">
 
-        <h1 tabindex="0">Masso Timer</h1>
+    <h1>Masso Timer</h1>
 
-        <!-- Instruções para leitores -->
-        <p id="instrucoes" class="sr-only">
-            Deslize para navegar entre as opções e toque duas vezes para iniciar ou parar.
-        </p>
+    <!-- Região de instrução -->
+    <p class="sr-only" id="instrucoes">
+        Deslize para navegar entre as opções e toque duas vezes para ativar.
+    </p>
 
-        <!-- Display apenas visual -->
-        <h2 id="display" aria-hidden="true">00:00</h2>
+    <!-- Display visual -->
+    <h2 id="display">00:00</h2>
 
-        <!-- Botões acessíveis universalmente -->
-        <button id="massagem1" aria-describedby="instrucoes">
-            Massagem 1 - 2 minutos
+    <!-- Região para leitor -->
+    <div id="timer-status" class="sr-only" aria-live="polite"></div>
+
+    <!-- Botões agrupados -->
+    <div role="group" aria-label="Opções de massagem">
+
+        <button id="massagem1"
+            aria-label="Iniciar massagem de 2 minutos"
+            aria-pressed="false">
+            MASSAGEM 1 - 2 MIN
         </button>
 
-        <button id="massagem2" aria-describedby="instrucoes">
-            Massagem 2 - 3 minutos
+        <button id="massagem2"
+            aria-label="Iniciar massagem de 3 minutos"
+            aria-pressed="false">
+            MASSAGEM 2 - 3 MIN
         </button>
 
-    </main>
+    </div>
+
+</main>
+
 
     <script src="app.js"></script>
 
