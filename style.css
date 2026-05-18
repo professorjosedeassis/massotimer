@@ -41,11 +41,12 @@ h2 {
 
 button {
     width: 100%;
-    padding: 20px;
+    padding: 22px;
     margin: 12px 0;
     font-size: 1.4rem;
+    font-weight: bold;
     border: 2px solid var(--primary);
-    border-radius: 12px;
+    border-radius: 14px;
     background: transparent;
     color: var(--text);
     cursor: pointer;

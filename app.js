@@ -3,6 +3,7 @@ const status = document.getElementById("timer-status");
 
 const btn1 = document.getElementById("massagem1");
 const btn2 = document.getElementById("massagem2");
+const btn3 = document.getElementById("massagem3");
 
 let intervalo = null;
 let tempoRestante = 0;
@@ -24,7 +25,7 @@ function iniciarAudio() {
     }
 }
 
-// 🔔 Bip suave e confortável
+// 🔔 Bip suave
 function bip(freq = 720, dur = 0.45, volume = 0.18) {
     try {
         iniciarAudio();
@@ -50,7 +51,6 @@ function bip(freq = 720, dur = 0.45, volume = 0.18) {
     }
 }
 
-// 🌿 Aviso suave por minuto
 function avisoMinuto() {
     bip(720, 0.45, 0.16);
 
@@ -59,7 +59,6 @@ function avisoMinuto() {
     }, 600);
 }
 
-// ⏳ Aviso faltando 20 segundos
 function aviso20Segundos() {
     bip(680, 0.35, 0.14);
 
@@ -68,7 +67,6 @@ function aviso20Segundos() {
     }, 500);
 }
 
-// 🧘 Finalização tranquila
 function avisoFinal() {
     bip(432, 0.7, 0.16);
 
@@ -81,7 +79,7 @@ function avisoFinal() {
     }, 1800);
 }
 
-// 🗣️ Leitor de tela
+// 🗣️ TalkBack
 function falar(texto) {
     status.textContent = "";
 
@@ -97,7 +95,7 @@ function vibrar(padrao = [200]) {
     }
 }
 
-// ⏱️ Formatação
+// ⏱️ Formatar
 function formatarTempo(seg) {
     const min = Math.floor(seg / 60);
     const sec = seg % 60;
@@ -105,7 +103,6 @@ function formatarTempo(seg) {
     return `${String(min).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
 }
 
-// 🔄 Atualização visual
 function atualizarDisplay() {
     display.textContent = formatarTempo(tempoRestante);
 }
@@ -128,13 +125,11 @@ function pararTimer() {
 // ▶️ Iniciar
 function iniciarTimer(minutos, botao) {
 
-    // Mesmo botão = parar
     if (botaoAtivo === botao) {
         pararTimer();
         return;
     }
 
-    // Outro timer ativo
     if (intervalo) {
         pararTimer();
     }
@@ -162,7 +157,7 @@ function iniciarTimer(minutos, botao) {
 
         atualizarDisplay();
 
-        // 🌿 Aviso por minuto (evita repetição)
+        // Aviso por minuto
         if (
             tempoRestante > 0 &&
             tempoRestante % 60 === 0 &&
@@ -180,7 +175,7 @@ function iniciarTimer(minutos, botao) {
             );
         }
 
-        // ⏳ Aviso faltando 20 segundos
+        // Aviso 20 segundos
         if (
             tempoRestante === 20 &&
             !aviso20SegundosDado
@@ -193,7 +188,7 @@ function iniciarTimer(minutos, botao) {
             aviso20SegundosDado = true;
         }
 
-        // 🧘 Finalização
+        // Final
         if (tempoRestante <= 0) {
             clearInterval(intervalo);
             intervalo = null;
@@ -211,7 +206,7 @@ function iniciarTimer(minutos, botao) {
     }, 500);
 }
 
-// 🔄 Corrigir ao retornar da tela bloqueada
+// Corrigir ao retornar
 document.addEventListener("visibilitychange", () => {
     if (!document.hidden && intervalo) {
 
@@ -227,6 +222,7 @@ document.addEventListener("visibilitychange", () => {
 // 🎯 Eventos
 btn1.addEventListener("click", () => iniciarTimer(2, btn1));
 btn2.addEventListener("click", () => iniciarTimer(3, btn2));
+btn3.addEventListener("click", () => iniciarTimer(6, btn3));
 
 // 🚀 Inicialização
 window.addEventListener("load", () => {
